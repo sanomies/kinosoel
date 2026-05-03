@@ -308,7 +308,7 @@ export default function SearchPage() {
           <Box sx={{
             display: 'grid',
             gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(4, 1fr)', lg: 'repeat(6, 1fr)', xl: 'repeat(8, 1fr)' },
-            gap: { xs: '6px', sm: 2 },
+            gap: 0,
           }}>
             {sortedMovies.map((movie) => (
               <MovieCard

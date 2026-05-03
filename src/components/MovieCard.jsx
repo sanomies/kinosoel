@@ -66,6 +66,7 @@ export default function MovieCard({
           position: 'relative',
           overflow: 'hidden',
           cursor: 'pointer',
+          borderRadius: 0,
           outline: inAnyList && showOutline ? '2px solid #E50914' : 'none',
           '&:hover .overlay': { opacity: 1 },
         }}
@@ -223,42 +224,54 @@ export default function MovieCard({
         onCreateAndAdd={onCreateAndAdd}
       />
 
-      <Dialog open={infoOpen} onClose={() => setInfoOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog open={infoOpen} onClose={() => setInfoOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle sx={{ fontWeight: 700, pb: 1 }}>{title}</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            <Box sx={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
-              {year && <Typography variant="body2" color="text.secondary">{year}</Typography>}
-              {director && year && <Typography variant="body2" color="text.secondary">•</Typography>}
-              {director && (
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
-                  onClick={() => { setInfoOpen(false); onDirectorClick?.(director) }}
-                >
-                  {director.name}
+          <Box sx={{ display: 'flex', gap: 2.5 }}>
+            {/* Poster — desktop only */}
+            {posterPath && (
+              <Box
+                component="img"
+                src={poster}
+                alt={title}
+                sx={{ display: { xs: 'none', sm: 'block' }, width: 220, flexShrink: 0, alignSelf: 'flex-start', borderRadius: 1 }}
+              />
+            )}
+
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, flex: 1 }}>
+              <Box sx={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
+                {year && <Typography variant="body2" color="text.secondary">{year}</Typography>}
+                {director && year && <Typography variant="body2" color="text.secondary">•</Typography>}
+                {director && (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
+                    onClick={() => { setInfoOpen(false); onDirectorClick?.(director) }}
+                  >
+                    {director.name}
+                  </Typography>
+                )}
+              </Box>
+              {genreNames.length > 0 && (
+                <Box sx={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  {genreNames.map((g) => (
+                    <Box key={g} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: '6px', px: '8px', py: '3px' }}>
+                      <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>{genreLabel(g)}</Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+              {synopsisLoading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
+                  <CircularProgress size={24} color="primary" />
+                </Box>
+              ) : (
+                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+                  {synopsis || 'No synopsis available.'}
                 </Typography>
               )}
             </Box>
-            {genreNames.length > 0 && (
-              <Box sx={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                {genreNames.map((g) => (
-                  <Box key={g} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: '6px', px: '8px', py: '3px' }}>
-                    <Typography sx={{ fontSize: 12, color: 'text.secondary' }}>{genreLabel(g)}</Typography>
-                  </Box>
-                ))}
-              </Box>
-            )}
-            {synopsisLoading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
-                <CircularProgress size={24} color="primary" />
-              </Box>
-            ) : (
-              <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
-                {synopsis || 'No synopsis available.'}
-              </Typography>
-            )}
           </Box>
         </DialogContent>
       </Dialog>
