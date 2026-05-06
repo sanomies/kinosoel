@@ -42,6 +42,7 @@ export default function WatchlistPage() {
   const [suggestionsPage, setSuggestionsPage] = useState(1)
   const directorIdsRef = useRef([])
   const [watchlistMap, setWatchlistMap] = useState({})
+  const [directors, setDirectors] = useState({})
   const [shareDialog, setShareDialog] = useState(false)
   const [shareText, setShareText] = useState('')
   const [shareLoading, setShareLoading] = useState(false)
@@ -238,6 +239,29 @@ export default function WatchlistPage() {
       .catch(console.error)
       .finally(() => setLoadingSuggestions(false))
   }, [movies])
+
+  useEffect(() => {
+    const ids = [...movies, ...suggestions]
+      .map((m) => m.tmdbId)
+      .filter((id) => directors[id] === undefined)
+    if (ids.length === 0) return
+    let cancelled = false
+    Promise.all(
+      ids.map(async (id) => {
+        try {
+          const d = await getMovieDetails(id)
+          const dir = d.credits?.crew?.find((c) => c.job === 'Director')
+          return [id, dir ? { name: dir.name, personId: dir.id } : null]
+        } catch {
+          return [id, null]
+        }
+      })
+    ).then((entries) => {
+      if (cancelled) return
+      setDirectors((prev) => ({ ...prev, ...Object.fromEntries(entries) }))
+    })
+    return () => { cancelled = true }
+  }, [movies, suggestions, directors])
 
   const getSuggestionWatchlistIds = (tmdbId) => {
     const ids = new Set()
@@ -512,6 +536,7 @@ export default function WatchlistPage() {
                   loadingRt={false}
                   showOutline={false}
                   deleteMode={true}
+                  director={directors[movie.tmdbId] ?? null}
                 />
               ))}
             </div>
@@ -540,6 +565,7 @@ export default function WatchlistPage() {
                         onCreateAndAdd={(name) => handleSuggestionCreateAndAdd(movie, name)}
                         loadingRt={false}
                         showOutline={true}
+                        director={directors[movie.tmdbId] ?? null}
                       />
                     ))}
                   </div>
